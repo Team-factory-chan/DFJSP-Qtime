@@ -820,7 +820,7 @@ util = []
 ft_table = []
 
 for i in range(2,3):
-    main = FJSP_simulator('C:/Users/parkh/git_tlsgudcks/simulator/data/DFJSP_test.csv','C:/Users/parkh/git_tlsgudcks/simulator/data/DFJSP_setup_test.csv',
+    main = FJSP_simulator('/DFJSP_test.csv','C:/Users/parkh/git_tlsgudcks/simulator/data/DFJSP_setup_test.csv',
                           "C:/Users/parkh/git_tlsgudcks/simulator/data/DFJSP_Qdata_test.csv","C:/Users/parkh/git_tlsgudcks/simulator/data/DFJSP_rdData_test2.csv",i)
     FT, util2, ms = main.run()
     makespan_table.append(ms)
