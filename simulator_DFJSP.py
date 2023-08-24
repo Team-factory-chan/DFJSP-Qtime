@@ -812,16 +812,18 @@ class FJSP_simulator(object):
         return p_table[0][1], jop
     
 
-
-
+# link 입력 각자 자기 link 입력 후 # 지워서 사용
+# link = "C:/Users/AN ICHAN/Documents/캡스톤/JSP code/version3/data"
+# link = "C:/Users/parkh/git_tlsgudcks/simulator/data"
+# link = 희선링크
 
 makespan_table = []
 util = []
 ft_table = []
 
 for i in range(2,3):
-    main = FJSP_simulator('/DFJSP_test.csv','C:/Users/parkh/git_tlsgudcks/simulator/data/DFJSP_setup_test.csv',
-                          "C:/Users/parkh/git_tlsgudcks/simulator/data/DFJSP_Qdata_test.csv","C:/Users/parkh/git_tlsgudcks/simulator/data/DFJSP_rdData_test2.csv",i)
+    main = FJSP_simulator(link + '/DFJSP_test.csv',link+'/DFJSP_setup_test.csv',
+                          link+"/DFJSP_Qdata_test.csv",link+"/DFJSP_rdData_test2.csv",i)
     FT, util2, ms = main.run()
     makespan_table.append(ms)
     util.append(util2)
