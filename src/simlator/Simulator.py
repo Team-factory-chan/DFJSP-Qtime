@@ -33,20 +33,17 @@ class Simulator:
 
     demand_by_planhorizon = {}
     oper_in_list = {}
-    dispatcher = Dispatcher()
 
     done = False #종료조건 판단
     runtime = 0 #시간
     plotlydf = pd.DataFrame([],columns=['Type','JOB_ID','Task','Start','Finish','Resource','Rule','Step','Q_diff','Q_check'])
-    plotlydf_arrival_and_due = pd.DataFrame([],columns=['Type','JOB_ID','Task','Start','Finish','Resource','Rule','Step','Q_diff','Q_check'])
     step_number = 0
     event_list = []
     j = 0
-    j2 = 0
 
     dataSetId = ''
     plan_finish = False
-    sorted_event = {"plan_end":2, "job_arrival":1, "DoNothing":1, "track_in_finish":1, "setup_change":1, "NOTHING":1}
+    sorted_event = {"plan_end":3, "job_arrival":2, "DoNothing":2, "track_in_finish":1, "setup_change":1, "NOTHING":1}
 
     # bucket
     bucket_size = 24 * 7
@@ -121,7 +118,6 @@ class Simulator:
         cls.step_number = 0
         cls.event_list = []
         cls.j = 0
-        cls.j2 = 0
 
         with open(f'data_lot_machine_{cls.dataSetId}.pkl', 'rb') as file:
             loaded_df_list = pickle.load(file)
@@ -214,6 +210,7 @@ class Simulator:
 
     @classmethod
     def step2(cls, action_list, eps):
+        # action 마스킹용 스텝
         done = False
         while True:
             machineId = cls.select_machine()
@@ -254,7 +251,7 @@ class Simulator:
             machineId = cls.select_machine()
             if machineId != "NONE":
                 candidate_list = cls.get_candidate(machineId)
-                candidate_list = cls.dispatcher.dispatching_rule_decision(candidate_list, rule, cls.runtime)
+                candidate_list = Dispatcher.dispatching_rule_decision(candidate_list, rule, cls.runtime)
                 cls.get_event(candidate_list[0], machineId, rule)
             else:
                 if len(cls.event_list) == 0 and all(cls.lot_list[job].status == "DONE" for job in cls.lot_list):
@@ -502,9 +499,7 @@ class Simulator:
             if makespan < cls.machine_list[machine].last_work_finish_time:
                 makespan = cls.machine_list[machine].last_work_finish_time
 
-        if a != None :
-            cls.gantt_chart()
-        cls.reset()
+        cls.reset(cls.dataSetId)
         return makespan
     @classmethod
     def get_machine(cls, dataSetId):
