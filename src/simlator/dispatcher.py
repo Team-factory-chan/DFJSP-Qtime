@@ -35,39 +35,45 @@ class Dispatcher:
 
 
         return candidate_list
-
+    @classmethod
     def dispatching_rule_SPT(cls, candidate_list):
         #candidate_list = [job, processing_time, setup_time, finish time]
         candidate_list.sort(key=lambda x: x[1], reverse=False)
         #return job, processing_time, setup_time, finish_time
         return candidate_list
 
+    @classmethod
     def dispatching_rule_SSU(cls, candidate_list):
 
         candidate_list.sort(key=lambda x: [ x[2], x[0].duedate], reverse=False)
 
         return candidate_list
 
+    @classmethod
     def dispatching_rule_SPTSSU(cls, candidate_list):
         candidate_list.sort(key=lambda x: [ x[1]+x[2], x[0].duedate] , reverse=False)
 
         return candidate_list
 
+    @classmethod
     def dispatching_rule_MOR(cls, candidate_list):
         candidate_list.sort(key=lambda x: x[0].remain_operation, reverse=True)
 
         return candidate_list
 
+    @classmethod
     def dispatching_rule_LOR(cls, candidate_list):
 
         candidate_list.sort(key=lambda x: x[0].remain_operation, reverse=False)
         return candidate_list
 
+    @classmethod
     def dispatching_rule_EDD(cls, candidate_list):
         candidate_list.sort(key=lambda x: [ x[0].duedate, x[2]] , reverse=False)
 
         return candidate_list
 
+    @classmethod
     def dispatching_rule_NewRule1(cls, candidate_list):
         # candidate_list.sort(key=lambda x: x[0].duedate - self.time - x[1], reverse=False)
         #candidate_list.sort(key = lambda x: [x[2]] , reverse = False)
@@ -77,6 +83,7 @@ class Dispatcher:
 
         return candidate_list
 
+    @classmethod
     def dispatching_rule_NewRule2(cls, candidate_list):
         # candidate_list.sort(key=lambda x: x[0].duedate - self.time - x[1], reverse=False)
         #candidate_list.sort(key = lambda x: [x[2]] , reverse = False)
@@ -102,27 +109,33 @@ class Dispatcher:
 
         return candidate_list
 
+    @classmethod
     def dispatching_rule_CR(cls, candidate_list):
         candidate_list.sort(key=lambda x: (x[0].duedate - cls.time) / x[1], reverse=False)
         return candidate_list
 
+    @classmethod
     def dispatching_rule_MST(cls, candidate_list):
         candidate_list.sort(key=lambda x: [ x[0].duedate - cls.time - x[1], x[2]], reverse=False)
         return candidate_list
 
+    @classmethod
     def dispatching_rule_FIFO(cls, candidate_list):
 
         candidate_list.sort(key=lambda x: [x[0].job_arrival_time, x[2]], reverse=False)
         return candidate_list
 
+    @classmethod
     def dispatching_rule_LIFO(cls, candidate_list):
         candidate_list.sort(key=lambda x: [x[0].job_arrival_time, x[2]], reverse=True)
         return candidate_list
 
+    @classmethod
     def dispatching_rule_SQT(cls, candidate_list,curr_time):
         candidate_list.sort(key=lambda x: [-x[0].cal_q_time(curr_time) ,x[0].job_arrival_time], reverse = False)
         return candidate_list
 
+    @classmethod
     def dispatching_rule_NONE(cls, candidate_list):
         candidate_list = []
         return candidate_list
