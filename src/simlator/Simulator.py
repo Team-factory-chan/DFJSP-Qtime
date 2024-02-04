@@ -111,13 +111,8 @@ class Simulator:
         cls.machine_list = defaultdict(Resource)
         cls.lot_list = defaultdict(Lot)
         cls.runtime = 0  # 시간
-        cls.plotlydf = pd.DataFrame([], columns=['Type', 'JOB_ID', 'Task', 'Start', 'Finish', 'Resource', 'Rule', 'Step',
-                                             'Q_diff', 'Q_check'])
-        cls.plotlydf_arrival_and_due = pd.DataFrame([], columns=['Type', 'JOB_ID', 'Task', 'Start', 'Finish', 'Resource',
-                                                             'Rule', 'Step', 'Q_diff', 'Q_check'])
         cls.step_number = 0
         cls.event_list = []
-        cls.j = 0
 
         with open(f'data_lot_machine_{cls.dataSetId}.pkl', 'rb') as file:
             loaded_df_list = pickle.load(file)
@@ -133,7 +128,8 @@ class Simulator:
                                          cls.demand_by_planhorizon, cls.oper_in_list)
 
         cls.lot_categorize()
-
+        if Parameters.gantt_on:
+            GanttChart.reset()
         return s
 
     @classmethod
@@ -254,7 +250,7 @@ class Simulator:
                 candidate_list = Dispatcher.dispatching_rule_decision(candidate_list, rule, cls.runtime)
                 cls.get_event(candidate_list[0], machineId, rule)
             else:
-                if len(cls.event_list) == 0 and all(cls.lot_list[job].status == "DONE" for job in cls.lot_list):
+                if len(cls.event_list) == 0 and all(cls.lot_list[lot].status == "DONE" for lot in cls.lot_list):
                     break
                 cls.process_event()
                 if cls.plan_finish == True:
@@ -262,9 +258,8 @@ class Simulator:
                 
         
         Flow_time, machine_util, util, makespan, tardiness, lateness, t_max,q_time_true,q_time_false,q_job_t, q_job_f, q_time, rtf = cls.performance_measure()
-        gantt = GanttChart(cls.plotlydf, cls.plotlydf_arrival_and_due)
         if Parameters.gantt_on_check:
-            gantt.play_gantt()
+            GanttChart.play_gantt()
 
 
         print("FlowTime:" , Flow_time)
@@ -286,8 +281,7 @@ class Simulator:
     @classmethod
     def gantt_chart(cls):
         if Parameters.gantt_on:
-            gantt = GanttChart(cls.plotlydf, cls.plotlydf_arrival_and_due)
-            gantt.play_gantt()
+            GanttChart.play_gantt()
     @classmethod
     def load_lot(cls, lot_id):
         if lot_id in cls.unload_lot_list:
@@ -337,10 +331,8 @@ class Simulator:
             end = datetime.fromtimestamp(event.end_time*3600)
             q_time_diff = event.q_time_diff
             q_time_check = event.q_time_check
-            #print(self.step_number) Q_Check , Q_time_over
-            cls.plotlydf.loc[cls.j] = dict(Type = event_type, JOB_ID = event.job.id  ,Task=event.jop, Start=start, Finish=end, Resource=event.machine.id, Rule = rule,
-                                             Step = step, Q_diff = q_time_diff, Q_check = q_time_check) #간트차트를 위한 딕셔너리 생성, 데이터프레임에 집어넣음
-            cls.j+=1
+            if Parameters.gantt_on or Parameters.log_hitory:
+                GanttChart.save_histories(event_type, event.job.id, event.jop, start, end, event.machine.id, rule, step, q_time_diff, q_time_check)
 
     @classmethod
     def process_event_meta(cls):
