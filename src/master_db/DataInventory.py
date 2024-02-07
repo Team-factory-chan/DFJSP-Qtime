@@ -10,6 +10,7 @@ from src.model.Setup_db import *
 from src.model.Demand_db import *
 from src.model.machine_db import *
 from src.model.mac_status_db import *
+from src.model.Factory_db import *
 from master_db.SimDataInven import *
 
 class DataInventory:
@@ -18,11 +19,12 @@ class DataInventory:
     dict_data = {}      # dict데이터
     dataset_id = "MK01"
     db_dict = {"Machine_db": Machine_db, "Demand_db":Demand_db, "Job_db":Job_db,
-               "Oper_db":Oper_db,"ProcessingTime_db":ProcessingTime_db,"Setup_db":Setup_db, "MacStatus_db": Mac_Status_db}
+               "Oper_db":Oper_db,"ProcessingTime_db":ProcessingTime_db,"Setup_db":Setup_db, "MacStatus_db": Mac_Status_db,
+               "Factory_db":Factory_db}
     @classmethod
     def set_db_data(cls, data_id):
         cls.dataset_id = data_id
-        file_path = f'master_db/pickleDBData/{cls.dataset_id}_db_data.pkl'
+        file_path = f'src/master_db/pickleDBData/{cls.dataset_id}_db_data.pkl'
         if os.path.exists(file_path):
 
             with open(file_path, 'rb') as file:
@@ -107,6 +109,10 @@ class DataInventory:
     @classmethod
     def get_demand_db_data(cls):
         return cls.master_data["Demand_db"]
+
+    @classmethod
+    def get_factory_db_data(cls):
+        return cls.master_data['Factory_db']
 
     @classmethod
     def get_mac_status_db_data(cls):

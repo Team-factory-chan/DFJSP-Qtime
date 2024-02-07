@@ -7,10 +7,10 @@ Base = declarative_base()
 class Oper_db(Base):
     __tablename__ = 'Oper'
 
-    dataSetId = Column(String(50), ForeignKey('DataSet.dataSetId'), primary_key=True)
-    jobId = Column(String(50), ForeignKey('Job.jobId'), primary_key=True)
+    dataSetId = Column(String(50),  primary_key=True)
+    jobId = Column(String(50),  primary_key=True)
     operId = Column(String(50), primary_key=True)
-    jobType = Column(String(50), ForeignKey('Job.jobType'))
+    jobType = Column(String(50))
     lastoper = Column(Boolean)
     operDesc = Column(String(255))
     operQtime = Column(Integer)

@@ -7,7 +7,7 @@ Base = declarative_base()
 class Mac_Status_db(Base):
     __tablename__ = 'Mac_Status'
 
-    dataSetId = Column(String(50), ForeignKey('DataSet.dataSetId'), primary_key=True)
+    dataSetId = Column(String(50),  primary_key=True)
     machineId = Column(String(50))
     machineType = Column(String(50), primary_key=True)
     status = Column(String(50))

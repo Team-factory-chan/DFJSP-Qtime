@@ -6,7 +6,7 @@ Base = declarative_base()
 class Job_db(Base):
     __tablename__ = 'Job'
 
-    dataSetId = Column(String(50),ForeignKey('DataSet.dataSetId'), primary_key=True)
+    dataSetId = Column(String(50), primary_key=True)
     jobId = Column(String(50), primary_key=True)
     jobType = Column(String(50))
     jobDesc = Column(String(255))

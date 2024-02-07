@@ -6,9 +6,9 @@ Base = declarative_base()
 class Demand_db(Base):
     __tablename__ = 'Demand'
 
-    dataSetId = Column(String(50),ForeignKey('DataSet.dataSetId'), primary_key=True)
+    dataSetId = Column(String(50), primary_key=True)
     demandId = Column(String(50), primary_key=True)
-    jobId = Column(String(50), ForeignKey('Job.jobId'))
+    jobId = Column(String(50))
     arrivalData = Column(Integer)
     duedate = Column(Integer)
     isUpdated = Column(DateTime, default=datetime.now)  # 기본값 설정

@@ -21,24 +21,36 @@ cursor = db.cursor()
 
 #create table
 create_dataSet = '''
-        CREATE TABLE DataSet (
+    CREATE TABLE DataSet (
     dataSetId VARCHAR(50) PRIMARY KEY,
     dataDesc VARCHAR(255),
     createUser VARCHAR(50),
     isUpdated TIMESTAMP,
     isCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 '''
-create_machine = """
-CREATE TABLE Machines (
-    machineId VARCHAR(50),
+create_factory = """
+    CREATE TABLE Factory (
     dataSetId VARCHAR(50),
+    factoryId VARCHAR(50),
+    factoryDesc VARCHAR(255),
+    isUpdated TIMESTAMP,
+    isCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (dataSetId, factoryId)
+
+"""
+
+create_machine = """
+    CREATE TABLE Machine (
+    dataSetId VARCHAR(50),
+    machineId VARCHAR(50),
     machineType VARCHAR(255),
     machineDesc VARCHAR(255),
+    factoryId VARCHAR(50),
     isUpdated TIMESTAMP,
-    isCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    PRIMARY KEY (machineId, DataSetId),
-    FOREIGN KEY (dataSetId) REFERENCES DataSet(dataSetId)
+    isCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (machineId, DataSetId)
 );
 """
 create_Job ="""
@@ -50,8 +62,7 @@ create_Job ="""
     maxOper INT,
     isUpdated TIMESTAMP,
     isCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (jobId, dataSetId),
-    FOREIGN KEY (dataSetId) REFERENCES DataSet(DataSetId)
+    PRIMARY KEY (jobId, dataSetId)
 );
 """
 created_oper = '''
@@ -65,10 +76,7 @@ CREATE TABLE Oper (
     operQtime INT,
     isUpdated TIMESTAMP,
     isCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (jobId, dataSetId, operId),
-    FOREIGN KEY (dataSetId) REFERENCES DataSet(DataSetId),
-    FOREIGN KEY (jobId) REFERENCES Job(jobId),
-    FOREIGN KEY (jobType) REFERENCES Job(jobType)
+    PRIMARY KEY (jobId, dataSetId, operId)
 );
 '''
 created_index ='''
@@ -86,10 +94,7 @@ CREATE TABLE Setup (
     setupTime INT,
     isUpdated TIMESTAMP,
     isCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (machineId, dataSetId, machineType, fromJobType, toJobType),
-    FOREIGN KEY (dataSetId) REFERENCES DataSet(DataSetId),
-    FOREIGN KEY (machineId) REFERENCES Machines(machineId),
-    FOREIGN KEY (machineType) REFERENCES Machines(machineType)
+    PRIMARY KEY (machineId, dataSetId, machineType, fromJobType, toJobType)
 );
 '''
 created_ProcessingTime = '''
@@ -101,11 +106,7 @@ CREATE TABLE ProcessingTime (
     processingTime INT,
     isUpdated TIMESTAMP,
     isCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (operId, dataSetId, machineType, jobType),
-    FOREIGN KEY (dataSetId) REFERENCES DataSet(DataSetId),
-    FOREIGN KEY (operId) REFERENCES Oper(operId),
-    FOREIGN KEY (machineType) REFERENCES Machines(machineType),
-    FOREIGN KEY (jobType) REFERENCES Job(jobType)
+    PRIMARY KEY (operId, dataSetId, machineType, jobType)
 );
 '''
 created_Demand = '''
@@ -117,8 +118,7 @@ CREATE TABLE Demand (
     dueDate INT,
     isUpdated TIMESTAMP,
     isCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (dataSetId, demandId),
-    FOREIGN KEY (dataSetId) REFERENCES DataSet(DataSetId)
+    PRIMARY KEY (dataSetId, demandId)
 );
 '''
 
@@ -128,13 +128,40 @@ def insert_dataSetId(dataSetId, dataDesc, createUser):
     VALUES ('{dataSetId}', '{dataDesc}', '{createUser}');
     '''
     cursor.execute(insert_query)
+
+def insert_factory(dataSetId, factroy_data):
+    fac_list = set()
+    for i in range(len(factroy_data)):
+        row = factroy_data.iloc[i]
+        insert_machine_factory(dataSetId, row)
+        fac_id = row.fac_id
+        fac_desc = row.fac_desc
+        if fac_id in fac_list:
+            continue
+        fac_list.add(fac_id)
+        insert_query = f'''
+        INSERT INTO Factory (dataSetId, factoryId, factoryDesc)
+        VALUES('{dataSetId}', '{fac_id}','{fac_desc}');
+        '''
+        cursor.execute(insert_query)
+    return len(factroy_data)
+def insert_machine_factory(dataSetId, row):
+    machine_id = row.mac_id
+    machine_type = row.mac_type
+    factory_id = row.fac_id
+    insert_machine = f'''
+    INSERT INTO Machine (MachineId, DataSetId, MachineType, MachineDesc, factoryId)
+    VALUES('{machine_id}', '{dataSetId}', '{machine_type}', '{dataSetId}_{machine_id}', '{factory_id}');       
+    '''
+    cursor.execute(insert_machine)
+
 def insert_machine(dataSetId, p_data):
     number_of_machine = 0
     for machineId in p_data.columns:
         number_of_machine += 1
         insert_machine = f'''
-        INSERT INTO Machines (MachineId, DataSetId, MachineType, MachineDesc)
-        SELECT '{machineId}', '{dataSetId}', '{machineId}', '{dataSetId}_{machineId}'
+        INSERT INTO Machine (MachineId, DataSetId, MachineType, MachineDesc, factoryId)
+        SELECT '{machineId}', '{dataSetId}', '{machineId}', '{dataSetId}_{machineId}', '{factory_id}'
         FROM DataSet
         WHERE DataSetId = '{dataSetId}';
         '''
@@ -151,10 +178,8 @@ def insert_Job_oper(dataSetId, p_data, q_data = pd.DataFrame()):
     for k, v in count_oper_dict.items():
         oper_list.append(v)
         insert_job = f'''
-        INSERT INTO Job (jobId, DataSetId, jobType, jobDesc, maxOper)
-        SELECT '{k}', DataSet.dataSetId, '{k}', '{dataSetId}_{k}', '{v}'
-        FROM DataSet
-        WHERE DataSetId = '{dataSetId}';
+        INSERT INTO Job ( dataSetId, jobId, jobType, jobDesc, maxOper)
+        VALUES ('{dataSetId}','{k}', '{k}', '{dataSetId}_{k}', '{v}');
         '''
         cursor.execute(insert_job)
         for oper in range(1, v+1):
@@ -164,13 +189,8 @@ def insert_Job_oper(dataSetId, p_data, q_data = pd.DataFrame()):
             else:
                 q_time = q_data.loc[k, str(oper)]
             insert_oper = f'''
-            INSERT INTO Oper (jobId, DataSetId, jobType, operId, lastOper, operDesc, operQtime)
-            SELECT Job.jobId, DataSet.dataSetId, Job.jobId, '{oper_id}', '{1 if oper == v else 0}', '{oper_id}', '{q_time}'
-            FROM DataSet
-            JOIN Job ON Job.dataSetId = DataSet.DataSetId
-            WHERE DataSet.DataSetId = '{dataSetId}' AND Job.jobId = '{k}';
-            
-
+            INSERT INTO Oper ( DataSetId,jobId, jobType, operId, lastOper, operDesc, operQtime)
+            VALUES ('{dataSetId}','{k}', '{k}', '{oper_id}', '{1 if oper == v else 0}', '{oper_id}', '{q_time}');
             '''
             cursor.execute(insert_oper)
     number_of_job = len(count_oper_dict)
@@ -189,12 +209,8 @@ def insert_Setup(dataSetId, number_of_mahicne, number_of_job, s_data = pd.DataFr
                 print(from_job_id, to_job_id)
                 insert_setup = f'''
                     INSERT INTO Setup (dataSetId, machineId, machineType, fromJobType, toJobType, setupTime)
-                    SELECT JobTo.dataSetId, Machines.machineId, Machines.machineType, 
-                           JobFrom.jobType, JobTo.jobType, '{setup_time}'
-                    FROM Job as JobFrom, Job as JobTo
-                    JOIN Machines ON Machines.machineId = '{machineId}' AND Machines.dataSetId = '{dataSetId}'
-                    WHERE JobTo.dataSetId = '{dataSetId}' and JobFrom.dataSetId = '{dataSetId}'
-                    AND JobFrom.jobId = '{from_job_id}' AND JobTo.jobId = '{to_job_id}';
+                    VALUES ('{dataSetId}', '{machineId}', '{machineId}', 
+                           '{from_job_id}', '{to_job_id}', '{setup_time}');
                 '''
                 print(insert_setup)
                 cursor.execute(insert_setup)
@@ -209,10 +225,7 @@ def insert_ProcessingTime(dataSetId, p_data ,number_of_job , number_of_machine, 
                 # jobId를 동적으로 생성
                 insert_oper = f'''
             INSERT INTO ProcessingTime (dataSetId ,machineType, jobType, processingTime,operId)
-            SELECT Oper.dataSetId, Machines.machineType, Oper.jobType,'{processing_time}', Oper.operId
-            FROM Oper
-            JOIN Machines ON Machines.machineId = '{machineId}' AND Machines.dataSetId = '{dataSetId}'
-            WHERE Oper.operId = '{oper_id}' AND Oper.dataSetId = '{dataSetId}';
+            VALUES ('{dataSetId}', '{machineId}', '{job_id}','{processing_time}','{oper_id}');
             '''
 
                 cursor.execute(insert_oper)
@@ -224,10 +237,7 @@ def insert_Demand(dataSetId, number_of_job ,rd_data=pd.DataFrame()):
             demand_id = f'{dataSetId}_D_{i:03}'
             insert_oper = f'''
             INSERT INTO Demand (jobId, DataSetId, demandId, arrivalData, dueDate)
-            SELECT Job.jobId, DataSet.DataSetId, '{demand_id}', 0, 0
-            FROM Job
-            JOIN DataSet ON Job.dataSetId = DataSet.DataSetId 
-            WHERE DataSet.DataSetId = '{dataSetId}' AND Job.jobId = '{job_id}';
+            VALUES ('{job_id}', '{dataSetId}', '{demand_id}', 0, 0);
             '''
             cursor.execute(insert_oper)
     else:
@@ -238,9 +248,7 @@ def insert_Demand(dataSetId, number_of_job ,rd_data=pd.DataFrame()):
             due_date = rd_data.iloc[j, 1]
             insert_oper = f'''
                         INSERT INTO Demand (jobId, DataSetId, demandId, arrivalData, dueDate)
-                        SELECT Job.jobId, Job.dataSetId, '{demand_id}', '{arrival_time}', '{due_date}'
-                        FROM Job
-                        WHERE Job.DataSetId = '{dataSetId}' AND Job.jobId = '{job_id}';
+                        VALUES ('{job_id}', '{dataSetId}', '{demand_id}', '{arrival_time}', '{due_date}');
                         '''
             cursor.execute(insert_oper)
 
@@ -263,13 +271,15 @@ def insert_machine_status(dataSetId, mac_st_data):
                                 '''
         cursor.execute(insert_mac_st)
 
-def insert_db(dataSetId, dataDesc ,create_user ,p_data, s_data = None, rd_data = None, q_data =None, mac_st_data = None):
+def insert_db(dataSetId, dataDesc ,create_user ,p_data, s_data = None, rd_data = None, q_data =None, mac_st_data = None, mac_to_factory_data=None):
 
 
     insert_dataSetId(dataSetId, dataDesc, create_user)
     print("clear_dataSetId")
-    number_of_machine = insert_machine(dataSetId,p_data)
-    print("clear_machine")
+    number_of_machine = insert_factory(dataSetId, mac_to_factory_data)
+    print('clear_factory')
+    """number_of_machine = insert_machine(dataSetId,p_data)
+    print("clear_machine")"""
     number_of_job, oper_list = insert_Job_oper(dataSetId, p_data ,q_data)
     print("clear_job")
     insert_Setup(dataSetId, number_of_machine, number_of_job, s_data)
@@ -292,16 +302,17 @@ def insert_db(dataSetId, dataDesc ,create_user ,p_data, s_data = None, rd_data =
 
 
 """
-
+#/Users/shin/DFJSP-Qtime/src/save_data/Parallel/mac_to_factory.csv
 insert_db(
-    dataSetId= "sks_train_20",
+    dataSetId= "sks_train_1",
     dataDesc = "cnn_real data",
     create_user = "hyungchan_shin",
-    p_data = pd.read_csv("/Users/shin/DFJSP-Qtime/save_data/Parallel/sks_p.csv", index_col=(0)),
-    s_data = pd.read_csv("/Users/shin/DFJSP-Qtime/save_data/Parallel/sks_s.csv", index_col=(0)),
-    rd_data = pd.read_csv("/Users/shin/DFJSP-Qtime/save_data/Parallel/sks_rd20.csv", index_col=(0)),
-    q_data = pd.read_csv("/Users/shin/DFJSP-Qtime/save_data/Parallel/sks_q.csv", index_col=(0)),
-    mac_st_data = pd.read_csv("/Users/shin/DFJSP-Qtime/save_data/Parallel/sks_mac_st20.csv", index_col=(0))
+    p_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/sks_p.csv", index_col=(0)),
+    s_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/sks_s.csv", index_col=(0)),
+    rd_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/sks_rd20.csv", index_col=(0)),
+    q_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/sks_q.csv", index_col=(0)),
+    mac_st_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/sks_mac_st20.csv", index_col=(0)),
+    mac_to_factory_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/mac_to_factory.csv", index_col=(0))
                               )
 
 

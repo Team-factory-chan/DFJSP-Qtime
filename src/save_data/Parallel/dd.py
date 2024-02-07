@@ -3,7 +3,7 @@ import random
 
 import pandas as pd
 
-df = pd.read_csv("/Users/shin/DFJSP-Qtime/save_data/Parallel/sks_rd10.csv")
+df = pd.read_csv("/save_data/Parallel/sks_rd10.csv")
 
 jobs = ['j01', 'j02', 'j03', 'j04', 'j05']
 job_list = []

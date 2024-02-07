@@ -7,11 +7,11 @@ Base = declarative_base()
 class Setup_db(Base):
     __tablename__ = 'Setup'
 
-    dataSetId = Column(String(50), ForeignKey('DataSet.dataSetId'), primary_key=True)
-    machineId = Column(String(50), ForeignKey('Machines.machineId'), primary_key=True)
-    machineType = Column(String(50), ForeignKey('Machines.machineType'), primary_key=True)
-    fromJobType = Column(String(50), ForeignKey('Job.jobType'),primary_key=True)
-    toJobType = Column(String(50), ForeignKey('Job.jobType'), primary_key=True)
+    dataSetId = Column(String(50),  primary_key=True)
+    machineId = Column(String(50),  primary_key=True)
+    machineType = Column(String(50), primary_key=True)
+    fromJobType = Column(String(50), primary_key=True)
+    toJobType = Column(String(50),  primary_key=True)
     setupTime = Column(Integer)
     isUpdated = Column(DateTime, default=datetime.now)  # 기본값 설정
     isCreated = Column(DateTime, server_default='CURRENT_TIMESTAMP')

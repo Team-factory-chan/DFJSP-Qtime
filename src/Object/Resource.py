@@ -7,9 +7,10 @@ Created on Wed Jan 11 16:15:22 2023
 
 class Resource(object):
     # Default Constructor
-    def __init__(self, resource_id, machine_type, setup_time_table):
+    def __init__(self, resource_id, machine_type, setup_time_table, factory_id):
         self.id = resource_id #기계 아이디
         self.machine_type = machine_type # 기계 타입
+        self.factory_id = factory_id
         #TODO wait와 processing으로 변경
         self.status = "WAIT" #기계 작동유무 , 0은 쉬는 중, 1은 작동중
         self.setup_status = "NONE" #기계 셋업 상태

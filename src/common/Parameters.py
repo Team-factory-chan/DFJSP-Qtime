@@ -53,10 +53,10 @@ class Parameters:
     gantt_on = {
         "mahicne_on_job_number" : False,
         "machine_gantt" : False,
-        "DSP_gantt" : False,
+        "DSP_gantt" : True,
         "step_DSP_gantt" : False,
-        "heatMap_gantt" : True,
-        "main_gantt" : False,
+        "heatMap_gantt" : False,
+        "main_gantt" : True,
         "job_gantt_for_Q_time" : False
     }
 

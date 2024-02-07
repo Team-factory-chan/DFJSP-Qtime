@@ -3,11 +3,11 @@ from simlator.Simulator import *
 class Run_Simulator:
     def __init__(self):
         print("simulator on")
-        Parameters.set_dataSetId(["sks_train_20"])  # 사용할 데이터셋 설정
+        Parameters.set_dataSetId(["sks_train_1"])  # 사용할 데이터셋 설정
         Parameters.set_time_to_string() # 현재 시간 가져오는 코드 -> 로그 및 기록을 위함
         Parameters.set_check_log(True)  # common 남기기 여부
         Parameters.set_check_history_db(False)
-        Parameters.set_check_gantt_on(False)  # 간트차트 띄우기 여부
+        Parameters.set_check_gantt_on(True)  # 간트차트 띄우기 여부
         Parameters.set_meta_ver(False)
         Parameters.set_plan_horizon(840)
 

@@ -19,9 +19,11 @@ import math
 class Simulator:
     machine_list = {} #id로 객체 보관
     lot_list = {} #lot id로 객체 보관
+    machine_to_factory = {}
 
     unload_lot_list = {} # 아직 도착하지 못한 job, 처리가 완료된 job 기록
     load_lot_list = {} # 작업 가능한 lot 모음
+
 
     number_of_machine = 0
     number_of_job = 0
@@ -36,7 +38,6 @@ class Simulator:
 
     done = False #종료조건 판단
     runtime = 0 #시간
-    plotlydf = pd.DataFrame([],columns=['Type','JOB_ID','Task','Start','Finish','Resource','Rule','Step','Q_diff','Q_check'])
     step_number = 0
     event_list = []
     j = 0
@@ -502,8 +503,9 @@ class Simulator:
         cls.number_of_machine = len(machines)
         for machine in machines:
             setup_time_table = cls.get_setup_time_table(dataSetId, machine)
-            r = Resource(machine.machineId, machine.machineType, setup_time_table)
+            r = Resource(machine.machineId, machine.machineType, setup_time_table, machine.factoryId)
             cls.machine_list[machine.machineId] = r
+            cls.machine_to_factory[machine.machineId] = machine.factoryId
     @classmethod
     def get_lot(cls, dataSetId):
         # todo 만약 메타휴리스틱으로 실행시킬 경우에는 lotID를 메타휴리스틱에 적합하도록 설정하는 처리 필요

@@ -7,10 +7,10 @@ Base = declarative_base()
 class ProcessingTime_db(Base):
     __tablename__ = 'ProcessingTime'
 
-    dataSetId = Column(String(50), ForeignKey('DataSet.dataSetId'), primary_key=True)
+    dataSetId = Column(String(50), primary_key=True)
     operId = Column(String(50), primary_key=True)
-    jobType = Column(String(50), ForeignKey('Job.jobType'), primary_key=True)
-    machineType = Column(String(50), ForeignKey('Machines.machineType'), primary_key=True)
+    jobType = Column(String(50), primary_key=True)
+    machineType = Column(String(50), primary_key=True)
     processingTime = Column(Integer)
     isUpdated = Column(DateTime, default=datetime.now)  # 기본값 설정
     isCreated = Column(DateTime, server_default='CURRENT_TIMESTAMP')
