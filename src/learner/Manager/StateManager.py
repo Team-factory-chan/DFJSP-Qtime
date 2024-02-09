@@ -1,22 +1,22 @@
 import numpy as np
 from src.Object.Lot import *
-from src.common.Parameters import *
+from src.learner.common.Hyperparameters import *
 
 class StateManager:
     state_time = 0
     @classmethod
     def get_state(cls, j_list, r_list, cur_runtime, number_of_job, bucket, oper_in_list):
-        if Parameters.state_type == "state_12":
+        if Hyperparameters.state_type == "state_12":
             s = cls.set_state_12(j_list, r_list, cur_runtime)
-        elif Parameters.state_type == "state_36":
+        elif Hyperparameters.state_type == "state_36":
             s = cls.set_state_36(j_list, r_list, cur_runtime, number_of_job)
-        elif Parameters.state_type == "action_masking_state":
+        elif Hyperparameters.state_type == "action_masking_state":
             s = cls.set_action_masking_state(j_list, r_list, cur_runtime, number_of_job)
-        elif Parameters.state_type == "cnn_state":
+        elif Hyperparameters.state_type == "cnn_state":
             s = cls.set_state_cnn(bucket, oper_in_list, cur_runtime)
-        elif Parameters.state_type == "cnn":
+        elif Hyperparameters.state_type == "cnn":
             s = cls.set_state_cnn_state(bucket, oper_in_list, cur_runtime)
-        elif Parameters.state_type == 'default_state':
+        elif Hyperparameters.state_type == 'default_state':
             s = cls.set_state_default(j_list, r_list, cur_runtime)
         return s
 

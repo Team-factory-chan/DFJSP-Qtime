@@ -1,0 +1,33 @@
+# config.yml
+
+database:
+  host: localhost
+  port: 3306
+  user: rood
+  passwd: 1234
+  db: fjsp_simulator_db
+  charset : utf8
+
+hyperparameter:
+  gamma : 0.99
+  learning_rate : 0.0001
+  batch_size : 32
+  buffer_limit : 50000
+  input_layer : 51
+  output_layer : 10
+  episode : 100
+
+configRL:
+  state_type : default_state  # state_12, state_36, cnn, cnn_state
+  action_type : dsp_rule          #
+  reward_type : util          # makespan, rtf
+
+engine:
+  gantt_on_check : True  # 간트생성 on/off
+  log_on : True  # log 기록 on/off
+  param_down_on : True  # 모델 저장 on/off
+  meta_ver : False     # metaheuristic 버전 on/off
+  log_history : False  # lot 이력 db로 전송 여부
+  do_nothing_time : 24        # donothing time
+  plan_horizon : 100000000    # 계획 구동 기간
+  use_rule : SPT

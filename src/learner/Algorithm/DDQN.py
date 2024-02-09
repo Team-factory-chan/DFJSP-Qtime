@@ -1,6 +1,6 @@
 from src.learner.common.Qnet import *
 from src.learner.common.ReplayBuffer import *
-
+from src.learner.common.Hyperparameters import *
 import torch.nn.functional as F
 import torch.optim as optim
 from src.simlator.Simulator import *
@@ -29,12 +29,12 @@ class DDQN:
     @classmethod
     def main(cls):
         env = Simulator
-        q = Qnet(Parameters.r_param["input_layer"], Parameters.r_param["output_layer"])
-        q_target = Qnet(Parameters.r_param["input_layer"], Parameters.r_param["output_layer"])
+        q = Qnet(Hyperparameters.input_layer, Hyperparameters.output_layer)
+        q_target = Qnet(Hyperparameters.input_layer, Hyperparameters.output_layer)
         q_target.load_state_dict(q.state_dict())
-        memory = ReplayBuffer(Parameters.r_param["buffer_limit"])
+        memory = ReplayBuffer(Hyperparameters.buffer_limit)
         score = 0.0
-        optimizer = optim.Adam(q.parameters(), lr=Parameters.r_param["learning_rate"])
+        optimizer = optim.Adam(q.parameters(), lr=Hyperparameters.learning_rate)
 
         makespan_list = []
         q_over_time_list = []
@@ -46,8 +46,8 @@ class DDQN:
         if Parameters.param_down_on:
             os.makedirs(save_directory, exist_ok=True)  # 경로 없을 시 생성
 
-        for n_epi in range(Parameters.r_param["episode"]):
-            for dataid in Parameters.db_data:
+        for n_epi in range(Hyperparameters.episode):
+            for dataid in Parameters.datasetId:
                 epsilon = max(0.01, 0.8 - 0.001 * n_epi)
                 s = env.reset(dataid)
                 done = False
@@ -90,8 +90,8 @@ class DDQN:
     @classmethod
     def get_result(cls, parameter, dataSets):
         env = Simulator
-        memory = ReplayBuffer(Parameters.r_param["buffer_limit"])
-        q = Qnet(Parameters.r_param["input_layer"], Parameters.r_param["output_layer"])
+        memory = ReplayBuffer(Hyperparameters.buffer_limit)
+        q = Qnet(Hyperparameters.input_layer, Hyperparameters.output_layer)
         params = torch.load(parameter)
         q.load_state_dict(params)
         q.eval()
@@ -125,8 +125,8 @@ class DDQN:
         check_point_list = [i for i in range(1, len(file_list)) if i % interver == 0]
         check_point_list.append(len(file_list) - 1)
 
-        memory = ReplayBuffer(Parameters.r_param["buffer_limit"])
-        q = Qnet(Parameters.r_param["input_layer"], Parameters.r_param["output_layer"])
+        memory = ReplayBuffer(Hyperparameters.buffer_limit)
+        q = Qnet(Hyperparameters.input_layer, Hyperparameters.output_layer)
         mean_reward_by_checkpoint = {}
         max_reward_by_checkpoint = {}
         for check_point_number in check_point_list:

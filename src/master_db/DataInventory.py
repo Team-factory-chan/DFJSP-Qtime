@@ -24,7 +24,7 @@ class DataInventory:
     @classmethod
     def set_db_data(cls, data_id):
         cls.dataset_id = data_id
-        file_path = f'src/master_db/pickleDBData/{cls.dataset_id}_db_data.pkl'
+        file_path = f'{pathConfig.absolute_path}/{cls.dataset_id}_db_data.pkl'
         if os.path.exists(file_path):
 
             with open(file_path, 'rb') as file:

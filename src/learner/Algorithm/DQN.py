@@ -1,9 +1,10 @@
 from src.learner.common.Qnet import *
 from src.learner.common.ReplayBuffer import *
-
+from src.learner.common.Hyperparameters import *
 import torch.nn.functional as F
 import torch.optim as optim
 from src.simlator.Simulator import *
+import matplotlib.pyplot as plt
 
 from src.common.Parameters import *
 
@@ -13,13 +14,13 @@ class DQN:
     @classmethod
     def train(cls, q, q_target, memory, optimizer):
         for i in range(10):
-            s, a, r, s_prime, done_mask = memory.sample(Parameters.r_param["batch_size"])
+            s, a, r, s_prime, done_mask = memory.sample(Hyperparameters.batch_size)
             # q.number_of_time_list[a] += 1
             q_out = q(s)
             q_a = q_out.gather(1, a)
             max_q_prime = q_target(s_prime).max(1)[0].unsqueeze(1)
             # print(max_q_prime.shape)
-            target = r + Parameters.r_param["gamma"] * max_q_prime * done_mask
+            target = r + Hyperparameters.gamma * max_q_prime * done_mask
             loss = F.smooth_l1_loss(q_a, target)
             optimizer.zero_grad()
             loss.backward()
@@ -28,25 +29,25 @@ class DQN:
     @classmethod
     def main(cls):
         env = Simulator
-        q = Qnet(Parameters.r_param["input_layer"], Parameters.r_param["output_layer"])
-        q_target = Qnet(Parameters.r_param["input_layer"], Parameters.r_param["output_layer"])
+        q = Qnet(Hyperparameters.input_layer, Hyperparameters.output_layer)
+        q_target = Qnet(Hyperparameters.input_layer, Hyperparameters.output_layer)
         q_target.load_state_dict(q.state_dict())
-        memory = ReplayBuffer(Parameters.r_param["buffer_limit"])
+        memory = ReplayBuffer(Hyperparameters.buffer_limit)
         score = 0.0
-        optimizer = optim.Adam(q.parameters(), lr=Parameters.r_param["learning_rate"])
+        optimizer = optim.Adam(q.parameters(), lr=Hyperparameters.learning_rate)
 
         makespan_list = []
         q_over_time_list = []
         score_list = []
         util_list = []
         score_list2 = []
-        save_directory = Parameters.save_parameter_directory + Parameters.simulation_time  # 디렉토리 경로를 지정합니다.
+        save_directory = f"{pathConfig.model_save_path}/{Parameters.simulation_time}"  # 디렉토리 경로를 지정합니다.
 
         if Parameters.param_down_on:
             os.makedirs(save_directory, exist_ok=True)  # 경로 없을 시 생성
 
-        for n_epi in range(Parameters.r_param["episode"]):
-            for dataid in Parameters.db_data:
+        for n_epi in range(Hyperparameters.episode):
+            for dataid in Parameters.datasetId:
                 epsilon = max(0.01, 0.8 - 0.001 * n_epi)
                 s = env.reset(dataid)
                 done = False
@@ -83,13 +84,12 @@ class DQN:
         plt.plot(x, score_list2)
         plt.show()
         print("학습이 종료되었습니다")
-        return Flow_time, machine_util, util, makespan, score, makespan_list, q_over_time_list, score_list
 
     @classmethod
     def get_result(cls, parameter, dataSets):
         env = Simulator
-        memory = ReplayBuffer(Parameters.r_param["buffer_limit"])
-        q = Qnet(Parameters.r_param["input_layer"], Parameters.r_param["output_layer"])
+        q = Qnet(Hyperparameters.input_layer, Hyperparameters.output_layer)
+        memory = ReplayBuffer(Hyperparameters.buffer_limit)
         params = torch.load(parameter)
         q.load_state_dict(params)
         q.eval()
@@ -121,9 +121,7 @@ class DQN:
         interver = len(file_list)//number_of_checkpoint
         check_point_list = [i for i in range(1, len(file_list)) if i%interver == 0 ]
         check_point_list.append(len(file_list)-1)
-
-        memory = ReplayBuffer(Parameters.r_param["buffer_limit"])
-        q = Qnet(Parameters.r_param["input_layer"], Parameters.r_param["output_layer"])
+        q = Qnet(Hyperparameters.input_layer, Hyperparameters.output_layer)
         mean_reward_by_checkpoint = {}
         max_reward_by_checkpoint = {}
         for check_point_number in check_point_list:

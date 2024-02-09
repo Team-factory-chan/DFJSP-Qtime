@@ -1,18 +1,21 @@
 from common.Parameters import *
+import yaml
 from simlator.Simulator import *
 class Run_Simulator:
     def __init__(self):
         print("simulator on")
-        Parameters.set_dataSetId(["sks_train_1"])  # 사용할 데이터셋 설정
         Parameters.set_time_to_string() # 현재 시간 가져오는 코드 -> 로그 및 기록을 위함
-        Parameters.set_check_log(True)  # common 남기기 여부
-        Parameters.set_check_history_db(False)
-        Parameters.set_check_gantt_on(True)  # 간트차트 띄우기 여부
-        Parameters.set_meta_ver(False)
+        Parameters.set_absolute_path()
+
+        with open(f'{pathConfig.absolute_path}/hyperparameter.yaml', 'r') as file:
+            config_data = yaml.safe_load(file)
+
+        Parameters.init_parameter_setting(config_data['engine'])
+        Parameters.init_db_setting(config_data['database'])
+        Parameters.set_dataSetId(["sks_train_1"])  # 사용할 데이터셋 설정
         Parameters.set_plan_horizon(840)
 
-        Parameters.set_log_path() # 저장 경로 설정하는 코드
-        Simulator.init_simulator(Parameters.db_data) # 데이터셋 선택 후 데이터에 맞게 시뮬레이터 설정
+        Simulator.init_simulator(Parameters.datasetId) # 데이터셋 선택 후 데이터에 맞게 시뮬레이터 설정
         print("set complete")
     def main(self, mode, dsp_rule):
         logging.info(f"mode: {mode}")

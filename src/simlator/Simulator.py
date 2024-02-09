@@ -1,4 +1,5 @@
 from src.common import Parameters
+from src.learner.common.Hyperparameters import *
 from src.Object.Event import *
 from collections import defaultdict
 from src.Object.Resource import *
@@ -52,8 +53,10 @@ class Simulator:
     # 데이터 프레임 리스트를 피클링하여 파일에 저장
     @classmethod
     def init_simulator(cls, dataSetId):
-
-        cls.dataSetId = dataSetId[0]
+        try:
+            cls.dataSetId = dataSetId[0]
+        except:
+            print("dataSetId가 존재하지 않습니다")
         DataInventory.set_db_data(cls.dataSetId)
         cls.get_job_info(cls.dataSetId)
         cls.get_machine(cls.dataSetId)
@@ -62,9 +65,6 @@ class Simulator:
         cls.get_lot(cls.dataSetId)
         cls.get_mac_status_info(cls.dataSetId)
 
-        with open(f'data_lot_machine_{cls.dataSetId}.pkl', 'wb') as file:
-            df_list = [cls.lot_list, cls.machine_list, cls.event_list]
-            pickle.dump(df_list, file)
         e = Event(None, "plan_end", "NONE", cls.runtime, Parameters.plan_horizon, "plan_end", "NONE", "NONE", "NONE", 0)
         cls.event_list.append(e)
         cls.get_demand_by_planhorizon()
@@ -195,7 +195,7 @@ class Simulator:
                 candidate_list = cls.get_candidate(machineId)
                 rule_name, candidate = ActionManager.get_lot(candidate_list, action, cls.runtime)
 
-                r, cls.machine_list = RewardManager.get_reward(Parameters.reward_type, machineId, cls.lot_list,
+                r, cls.machine_list = RewardManager.get_reward(Hyperparameters.reward_type, machineId, cls.lot_list,
                                                                cls.machine_list, cls.runtime, candidate, cls.demand_by_planhorizon, cls.oper_in_list)
                 cls.update_bucket(candidate)
                 #print(r)
@@ -260,7 +260,7 @@ class Simulator:
         
         Flow_time, machine_util, util, makespan, tardiness, lateness, t_max,q_time_true,q_time_false,q_job_t, q_job_f, q_time, rtf = cls.performance_measure()
         if Parameters.gantt_on_check:
-            GanttChart.play_gantt()
+            GanttChart.play_gantt(cls.dataSetId)
 
 
         print("FlowTime:" , Flow_time)
@@ -282,7 +282,7 @@ class Simulator:
     @classmethod
     def gantt_chart(cls):
         if Parameters.gantt_on:
-            GanttChart.play_gantt()
+            GanttChart.play_gantt(datasetId=cls.dataSetId)
     @classmethod
     def load_lot(cls, lot_id):
         if lot_id in cls.unload_lot_list:

@@ -11,6 +11,7 @@ class GanttChart:
     color_by_color_mapper = {'j01': 'rgb(255, 204, 204)', 'j02': 'rgb(229, 204, 255)',
                              'j03': 'rgb(255, 255, 204)', 'j04': 'rgb(204, 229, 255)',
                              'j05': 'rgb(145, 229, 204)'}
+    dataset_id = ""
     @classmethod
     def reset(cls):
         cls.gantt_history = pd.DataFrame([],
@@ -52,8 +53,9 @@ class GanttChart:
         cls.gantt_history["ID_OP"] = id_op
 
     @classmethod
-    def play_gantt(cls):
+    def play_gantt(cls, datasetId):
         cls.update_df()
+        cls.dataset_id = datasetId
         for i in cls.gantt_on:
             if cls.gantt_on[i]:
                 if i == "main_gantt":
@@ -144,7 +146,7 @@ class GanttChart:
         [(cls.modify_width(bar, 0.7), cls.modify_text(bar))
          for bar in fig6.data if ('setup' in bar.legendgroup)]
         fig6.show()
-        fig6.write_html('CR.html')
+        fig6.write_html(f"{pathConfig.simulator_result_path}/{Parameters.simulation_time}_{cls.dataset_id}_gantt.html")
 
     @classmethod
     def job_gantt_for_Q_time(cls):
