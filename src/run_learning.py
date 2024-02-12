@@ -18,7 +18,7 @@ class Run_Simulator:
 
         Parameters.init_parameter_setting(config_data['engine'])
         Parameters.init_db_setting(config_data['database'])
-
+        Parameters.set_plan_horizon(840)
         action_list = ["SPTSSU", "SSU", "EDD", "MST", "FIFO", "LIFO"]
 
         Simulator._init(Parameters.datasetId)  # 데이터셋 선택 후 데이터에 맞게 시뮬레이터 설정
@@ -27,7 +27,6 @@ class Run_Simulator:
         Hyperparameters.init_rl_config_setting(config_data['configRL'], action_list,Simulator)
 
 
-        Parameters.set_plan_horizon(840)
         print("set complete")
 
 
@@ -56,7 +55,7 @@ class Run_Simulator:
 
 if True:
     simulator = Run_Simulator()
-    simulator.main("result","dqn") # dsp_rule = 개별 확인할 때만 사용하면 됨
+    simulator.main("learning","dqn") # dsp_rule = 개별 확인할 때만 사용하면 됨
 
 # gantt chart 쑬 것인지
 # 학습 방법, kpi목표
