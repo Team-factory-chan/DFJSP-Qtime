@@ -146,7 +146,7 @@ class GanttChart:
         [(cls.modify_width(bar, 0.7), cls.modify_text(bar))
          for bar in fig6.data if ('setup' in bar.legendgroup)]
         fig6.show()
-        fig6.write_html(f"{pathConfig.simulator_result_path}/{Parameters.simulation_time}_{cls.dataset_id}_gantt.html")
+        fig6.write_html(f"{pathConfig.simulator_result_path}{os.sep}{Parameters.simulation_time}_{cls.dataset_id}_gantt.html")
 
     @classmethod
     def job_gantt_for_Q_time(cls):

@@ -13,7 +13,7 @@ class Run_Simulator:
         Parameters.set_dataSetId(["sks_train_1"])  # 사용할 데이터셋 설정
         #Parameters.set_dataSetId(['sks_train_11'])
 
-        with open(f'{pathConfig.absolute_path}/hyperparameter.yaml', 'r') as file:
+        with open(f'{pathConfig.absolute_path}{os.sep}hyperparameter.yaml', 'r', encoding='utf-8') as file:
             config_data = yaml.safe_load(file)
 
         Parameters.init_parameter_setting(config_data['engine'])
@@ -47,11 +47,11 @@ class Run_Simulator:
                 PPO.main()
         elif mode == 'evaluate':
             if algorithm == "dqn":
-                DQN.get_evaluate(f"{pathConfig.model_save_path}/240209_233447", 100,
+                DQN.get_evaluate(f"{pathConfig.model_save_path}{os.sep}240209_233447", 100,
                                  ["sks_train_1"])
         elif mode == "result":
             if algorithm == 'dqn':
-                DQN.get_result(f"{pathConfig.model_save_path}/240209_233447/24param.pt", ["sks_train_1"])
+                DQN.get_result(f"{pathConfig.model_save_path}{os.sep}240209_233447{os.sep}24param.pt", ["sks_train_1"])
 
 if True:
     simulator = Run_Simulator()
