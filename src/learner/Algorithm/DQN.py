@@ -1,3 +1,5 @@
+import os
+
 from src.learner.common.Qnet import *
 from src.learner.common.ReplayBuffer import *
 from src.learner.common.Hyperparameters import *
@@ -41,7 +43,7 @@ class DQN:
         score_list = []
         util_list = []
         score_list2 = []
-        save_directory = f"{pathConfig.model_save_path}/{Parameters.simulation_time}"  # 디렉토리 경로를 지정합니다.
+        save_directory = f"{pathConfig.model_save_path}{os.sep}{Parameters.simulation_time}"  # 디렉토리 경로를 지정합니다.
 
         if Parameters.param_down_on:
             os.makedirs(save_directory, exist_ok=True)  # 경로 없을 시 생성

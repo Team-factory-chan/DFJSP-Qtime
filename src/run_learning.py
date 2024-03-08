@@ -1,3 +1,4 @@
+from learner.Algorithm.PPO import PPO
 from src.learner.Algorithm.DQN import *
 from src.learner.Algorithm.DQN_action_masking import *
 from src.learner.Algorithm.DQN_CNN import *
@@ -44,7 +45,8 @@ class Run_Simulator:
             elif algorithm == 'dqn_cnn':
                 DQN_CNN.main()
             elif algorithm == 'PPO':
-                PPO.main()
+                ppo =PPO()
+                ppo.main()
         elif mode == 'evaluate':
             if algorithm == "dqn":
                 DQN.get_evaluate(f"{pathConfig.model_save_path}{os.sep}240209_233447", 100,
@@ -55,7 +57,7 @@ class Run_Simulator:
 
 if True:
     simulator = Run_Simulator()
-    simulator.main("learning","dqn") # dsp_rule = 개별 확인할 때만 사용하면 됨
+    simulator.main("learning","PPO") # dsp_rule = 개별 확인할 때만 사용하면 됨
 
 # gantt chart 쑬 것인지
 # 학습 방법, kpi목표
