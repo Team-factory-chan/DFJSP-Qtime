@@ -114,7 +114,7 @@ class RewardManager:
 
     @classmethod
     def get_util_reward(cls, machine, candidate):
-        r= -candidate[2] /10.0
+        r= -candidate[2]/100.0
         return r
     @classmethod
     def get_reward(cls, reward_type,machine, j_list, r_list, curr_time, candidate, bucket, oper_in_list):
