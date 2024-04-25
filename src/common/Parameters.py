@@ -39,7 +39,8 @@ class Parameters:
         "FIFO": True,
         "LIFO": True,
         "CR": True,
-        "SQT" : True
+        "SQT" : True,
+        "LPT" : True
 
     }
 
