@@ -10,10 +10,10 @@ class Run_Simulator:
         with open(f'{pathConfig.absolute_path}/hyperparameter.yaml', 'r', encoding='utf-8') as file:
             config_data = yaml.safe_load(file)
 
-        Parameters.init_parameter_setting(config_data['engine'])
+        #Parameters.init_parameter_setting(config_data['engine'])
         Parameters.init_db_setting(config_data['database'])
-        Parameters.set_dataSetId(["sks_train_1"])  # 사용할 데이터셋 설정
-        Parameters.set_plan_horizon(840)
+        Parameters.set_dataSetId(["MK01"])  # 사용할 데이터셋 설정
+        #Parameters.set_plan_horizon(840)
 
         Simulator.init_simulator(Parameters.datasetId) # 데이터셋 선택 후 데이터에 맞게 시뮬레이터 설정
         print("set complete")
@@ -22,13 +22,6 @@ class Run_Simulator:
         logging.info(f"dsp_rule: {dsp_rule}")
         if mode == "DSP_run":
             Simulator.run(dsp_rule)
-            #self.simulator.run(dsp_rule)
-        elif mode == "DSP_check_run":
-            for i in Parameters.DSP_rule_check:
-                if Parameters.DSP_rule_check[i]:
-                    print(i)
-                    Simulator.run(i)
-                    Simulator.reset(Parameters.db_data)
 
 if True:
     simulator = Run_Simulator()
