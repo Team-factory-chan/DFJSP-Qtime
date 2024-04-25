@@ -36,7 +36,7 @@ class Run_Simulator:
         logging.info(f"dsp_rule: {algorithm}")
         if mode == "learning":
             if algorithm == 'dqn':
-                if ActionManager.action_type == "action_masking":
+                if Hyperparameters.action_type == "action_masking":
                     DQN_Action_Masking.main()
                 else:
                     DQN.main()
