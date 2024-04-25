@@ -65,8 +65,10 @@ class Simulator:
         cls.get_lot(cls.dataSetId)
         cls.get_mac_status_info(cls.dataSetId)
 
-        e = Event(None, "plan_end", "NONE", cls.runtime, Parameters.plan_horizon, "plan_end", "NONE", "NONE", "NONE", 0)
-        cls.event_list.append(e)
+        if Parameters.plan_horizon != 100000000 :
+            e = Event(None, "plan_end", "NONE", cls.runtime, Parameters.plan_horizon, "plan_end", "NONE", "NONE", "NONE", 0)
+            cls.event_list.append(e)
+
         cls.get_demand_by_planhorizon()
         cls.lot_categorize()
 
@@ -94,11 +96,15 @@ class Simulator:
             cls.get_lot(cls.dataSetId)
             cls.get_mac_status_info(cls.dataSetId)
 
+            if Parameters.plan_horizon != 100000000:
+                e = Event(None, "plan_end", "NONE", cls.runtime, Parameters.plan_horizon, "plan_end", "NONE", "NONE",
+                          "NONE", 0)
+                cls.event_list.append(e)
+
             with open(f'data_lot_machine_{cls.dataSetId}.pkl', 'wb') as file:
                 df_list = [cls.lot_list, cls.machine_list, cls.event_list]
                 pickle.dump(df_list, file)
-            e = Event(None, "plan_end", "NONE", cls.runtime, Parameters.plan_horizon, "plan_end", "NONE", "NONE", "NONE", 0)
-            cls.event_list.append(e)
+
             cls.lot_list = {}
             cls.event_list = []
             cls.machine_list = {}
@@ -122,8 +128,6 @@ class Simulator:
         cls.machine_list = loaded_df_list[1]
         cls.event_list = loaded_df_list[2]
 
-        e = Event(None, "plan_end", "NONE", cls.runtime, Parameters.plan_horizon, "plan_end", "NONE", "NONE", "NONE", 0)
-        cls.event_list.append(e)
         cls.get_demand_by_planhorizon()
         s = StateManager.get_state(cls.lot_list, cls.machine_list, cls.runtime, cls.number_of_job,
                                          cls.demand_by_planhorizon, cls.oper_in_list)
@@ -299,6 +303,7 @@ class Simulator:
 
     @classmethod
     def process_event(cls):
+        print(cls.event_list)
         cls.event_list.sort(key = lambda x:[ x.end_time, cls.sorted_event[x.event_type]], reverse = False)
         event = cls.event_list.pop(0)
         cls.runtime = event.end_time
@@ -360,7 +365,7 @@ class Simulator:
     @classmethod
     def select_machine(cls):
         selected_machine = "NONE"
-        if cls.runtime >= Parameters.plan_horizon:
+        if cls.runtime >= Parameters.plan_horizon and cls.runtime != 0:
             return selected_machine
         for machineId in cls.machine_list:
             if cls.machine_list[machineId].status == "WAIT":
@@ -534,6 +539,7 @@ class Simulator:
 
         for mac_row in mac_status:
             machine = cls.machine_list[mac_row.machineId] #machine 객체
+            # 새로운 Lot 생성
             job_id = mac_row.jobId
             j = Lot(mac_row.lotId, mac_row.jobId, cls.job_info[job_id]['job_type'],cls.job_info[job_id]["max_oper"]
                     ,mac_row.dueDate, 0, "WAIT",cls.job_info[job_id]["oper_list"],cls.get_q_time_table_of_opers(cls.job_info[mac_row.jobId]["oper_list"]))
