@@ -1,4 +1,5 @@
 from src.common.Parameters import *
+from src.master_db.DataInventory import *
 class Hyperparameters:
     gamma = 0.99
     learning_rate = 0.0001
@@ -41,6 +42,8 @@ class Hyperparameters:
             cls.action_dimension = [rule for rule in Parameters.DSP_rule_check.keys() if rule in action_list]
         elif action_type == "setup" or action_type == "action_masking":
             cls.action_type = action_type
+            #dataset Id 여러 개 처리가능
+            DataInventory.set_db_data(Parameters.datasetId[0])
             cls.action_dimension = [job.jobType for job in DataInventory.master_data["Job_db"]]
             cls.action_count = len(Hyperparameters.action_dimension)
         cls.output_layer = cls.action_count
@@ -59,6 +62,6 @@ class Hyperparameters:
         elif cls.state_type == 'default_state':
             cls.input_layer = 8
         elif cls.state_type == "state_36":
-            cls.input_layer = Simulator.number_of_machine * 3 + 6
+            cls.input_layer = Simulator.number_of_machine * 3 + 6 -2
         elif cls.state_type == 'cnn_state':
             cls.input_layer = 29
