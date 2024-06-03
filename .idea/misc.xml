@@ -5,5 +5,5 @@
     <option name="pathToExecutable" value="$PROJECT_DIR$/../anaconda3/bin/black" />
     <option name="sdkName" value="ray310" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="ray310" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="DFJSP-Qtime" project-jdk-type="Python SDK" />
 </project>
