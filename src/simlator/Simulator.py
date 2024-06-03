@@ -247,7 +247,7 @@ class Simulator:
         return s_prime, r, done, action
     @classmethod
     def run(cls, rule):
-
+        # 끝나면 시뮬레이션 종료
         while True:
             machineId = cls.select_machine()
             if machineId != "NONE":
