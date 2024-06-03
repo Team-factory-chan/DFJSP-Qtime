@@ -69,6 +69,9 @@ class DQN:
                                                                                      False, makespan_list, q_over_time_list,
                                                                                      score_list)
                 #env.gantt_chart()
+                # ---- 매 10 step마다 Target Network를 Q Network로 동기화 -----#
+                if n_epi % 20 == 0:
+                    q_target.load_state_dict(q.state_dict())
 
             # 학습구간
             if memory.size() > 1000:
