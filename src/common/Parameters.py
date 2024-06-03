@@ -22,8 +22,8 @@ class Parameters:
         "host" : 'localhost',
         "port" : 3306,
         "user" : 'root',
-        "passwd" : '1234',
-        "db" : 'fjsp_simulator_db',
+        "passwd" : '0000',
+        "db" : 'simulatordb',
         "charset" : 'utf8'
     }
 

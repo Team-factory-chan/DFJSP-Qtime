@@ -22,13 +22,6 @@ class Run_Simulator:
         logging.info(f"dsp_rule: {dsp_rule}")
         if mode == "DSP_run":
             Simulator.run(dsp_rule)
-            #self.simulator.run(dsp_rule)
-        elif mode == "DSP_check_run":
-            for i in Parameters.DSP_rule_check:
-                if Parameters.DSP_rule_check[i]:
-                    print(i)
-                    Simulator.run(i)
-                    Simulator.reset(Parameters.db_data)
 
 if True:
     simulator = Run_Simulator()

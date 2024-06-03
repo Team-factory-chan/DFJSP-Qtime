@@ -161,7 +161,7 @@ def insert_machine(dataSetId, p_data):
         number_of_machine += 1
         insert_machine = f'''
         INSERT INTO Machine (MachineId, DataSetId, MachineType, MachineDesc, factoryId)
-        SELECT '{machineId}', '{dataSetId}', '{machineId}', '{dataSetId}_{machineId}', '{factory_id}'
+        SELECT '{machineId}', '{dataSetId}', '{machineId}', '{dataSetId}_{machineId}', 'F1'
         FROM DataSet
         WHERE DataSetId = '{dataSetId}';
         '''
@@ -184,7 +184,7 @@ def insert_Job_oper(dataSetId, p_data, q_data = pd.DataFrame()):
         cursor.execute(insert_job)
         for oper in range(1, v+1):
             oper_id = f'{k}{oper:02}'
-            if q_data.empty:
+            if q_data == None:
                 q_time = 0
             else:
                 q_time = q_data.loc[k, str(oper)]
@@ -202,7 +202,7 @@ def insert_Setup(dataSetId, number_of_mahicne, number_of_job, s_data = pd.DataFr
                 machineId = f'M{i:01}'
                 from_job_id = f'j{j:02}'
                 to_job_id = f'j{k:02}'
-                if s_data.empty:
+                if s_data == None:
                     setup_time = 0
                 else:
                     setup_time = s_data[to_job_id].loc[from_job_id]
@@ -230,7 +230,7 @@ def insert_ProcessingTime(dataSetId, p_data ,number_of_job , number_of_machine, 
 
                 cursor.execute(insert_oper)
 def insert_Demand(dataSetId, number_of_job ,rd_data=pd.DataFrame()):
-    if rd_data.empty:
+    if rd_data == None:
         for i in range(1, number_of_job+1):
             # jobId를 동적으로 생성
             job_id = f'j{i:02}'
@@ -276,19 +276,19 @@ def insert_db(dataSetId, dataDesc ,create_user ,p_data, s_data = None, rd_data =
 
     insert_dataSetId(dataSetId, dataDesc, create_user)
     print("clear_dataSetId")
-    number_of_machine = insert_factory(dataSetId, mac_to_factory_data)
+    #number_of_machine = insert_factory(dataSetId, mac_to_factory_data)
     print('clear_factory')
-    """number_of_machine = insert_machine(dataSetId,p_data)
-    print("clear_machine")"""
+    number_of_machine = insert_machine(dataSetId,p_data)
+    print("clear_machine")
     number_of_job, oper_list = insert_Job_oper(dataSetId, p_data ,q_data)
     print("clear_job")
     insert_Setup(dataSetId, number_of_machine, number_of_job, s_data)
     print("clear_setup")
     insert_ProcessingTime(dataSetId, p_data, number_of_job, number_of_machine, oper_list)
     print("clear_ptime")
-    insert_Demand(dataSetId, 5, rd_data)
+    insert_Demand(dataSetId, number_of_job, rd_data)
     print("clear_demand")
-    insert_machine_status(dataSetId, mac_st_data)
+    #insert_machine_status(dataSetId, mac_st_data)
     print("clear_machine_status")
     db.commit()
     db.close()
@@ -304,15 +304,11 @@ def insert_db(dataSetId, dataDesc ,create_user ,p_data, s_data = None, rd_data =
 """
 #/Users/shin/DFJSP-Qtime/src/save_data/Parallel/mac_to_factory.csv
 insert_db(
-    dataSetId= "sks_train_1",
-    dataDesc = "cnn_real data",
-    create_user = "hyungchan_shin",
-    p_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/sks_p.csv", index_col=(0)),
-    s_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/sks_s.csv", index_col=(0)),
-    rd_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/sks_rd20.csv", index_col=(0)),
-    q_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/sks_q.csv", index_col=(0)),
-    mac_st_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/sks_mac_st20.csv", index_col=(0)),
-    mac_to_factory_data = pd.read_csv("/Users/shin/DFJSP-Qtime/src/save_data/Parallel/mac_to_factory.csv", index_col=(0))
+    dataSetId= "MK02",
+    dataDesc = "MK02",
+    create_user = "pjh",
+    p_data = pd.read_csv("C:/Users/user/github/DFJSP-Qtime/test_data/MK02.csv", index_col=(0))
+
                               )
 
 

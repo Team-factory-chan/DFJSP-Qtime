@@ -11,7 +11,7 @@ class Run_Simulator:
         Parameters.set_time_to_string()  # 현재 시간 가져오는 코드 -> 로그 및 기록을 위함
         Parameters.set_absolute_path()
 
-        Parameters.set_dataSetId(["sks_train_1"])  # 사용할 데이터셋 설정
+        Parameters.set_dataSetId(["sks_train_1", "sks_train_11"])  # 사용할 데이터셋 설정
         #Parameters.set_dataSetId(['sks_train_11'])
 
         with open(f'{pathConfig.absolute_path}{os.sep}hyperparameter.yaml', 'r', encoding='utf-8') as file:
@@ -49,15 +49,15 @@ class Run_Simulator:
                 ppo.main()
         elif mode == 'evaluate':
             if algorithm == "dqn":
-                DQN.get_evaluate(f"{pathConfig.model_save_path}{os.sep}240209_233447", 100,
-                                 ["sks_train_1"])
+                DQN.get_evaluate(f"{pathConfig.model_save_path}{os.sep}240528_224803", 20,
+                                 ["sks_train_11","sks_train_12"])
         elif mode == "result":
             if algorithm == 'dqn':
-                DQN.get_result(f"{pathConfig.model_save_path}{os.sep}240209_233447{os.sep}24param.pt", ["sks_train_1"])
+                DQN.get_result(f"{pathConfig.model_save_path}{os.sep}240515_171610{os.sep}36param.pt", ["sks_train_1"])
 
 if True:
     simulator = Run_Simulator()
-    simulator.main("learning","PPO") # dsp_rule = 개별 확인할 때만 사용하면 됨
+    simulator.main("evaluate","dqn") # dsp_rule = 개별 확인할 때만 사용하면 됨
 
 # gantt chart 쑬 것인지
 # 학습 방법, kpi목표
