@@ -10,14 +10,14 @@ import pandas as pd
 class Lot(object):
 
     # Default Constructor
-    def __init__(self, lot_id ,job_id, job_type ,max_operation, duedate, arrival_time, status, oper_list, q_time_table):
+    def __init__(self, lot_id, job_id, job_type, max_operation, duedate, arrival_time, status, oper_list, q_time_table):
         # 고정 정보
-        self.id = lot_id #job번호
+        self.id = lot_id # job번호
         self.job_id = job_id
-        self.job_type = job_type #job type이 뭔지
+        self.job_type = job_type # job type이 뭔지
         self.max_operation = max_operation # 이 job의 max operation이 언젠지
         self.duedate = duedate # 이 job의 duedate가 언제인지
-        self.oper_list= oper_list
+        self.oper_list = oper_list
         self.q_time_table = q_time_table
         """
         공정 수 만큼 존재함
@@ -73,7 +73,7 @@ class Lot(object):
         else:
             self.current_operation_id = self.oper_list[self.oper_number]
 
-    def complete_setting(self,start_time, end_time,event_type):
+    def complete_setting(self,start_time, end_time, event_type):
         self.status = "WAIT"
         last = False
         self.start_time = end_time #q_time을 체크하는 time임
@@ -86,6 +86,7 @@ class Lot(object):
             self.status = "DONE"
         self.act_end_time = end_time
         return last
+
     def arrival(self):
         self.status = "WAIT"
 
@@ -115,7 +116,7 @@ class Lot(object):
         q_time_diff = self.cal_q_time(c_time)
         if q_time_diff == 0 and self.start_time == 0:
             return 2
-        elif q_time_diff ==0:
+        elif q_time_diff == 0:
             return 1
         else:
             return 0

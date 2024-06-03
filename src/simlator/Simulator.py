@@ -128,7 +128,7 @@ class Simulator:
         cls.machine_list = loaded_df_list[1]
         cls.event_list = loaded_df_list[2]
 
-        cls.get_demand_by_planhorizon()
+        #cls.get_demand_by_planhorizon()
         s = StateManager.get_state(cls.lot_list, cls.machine_list, cls.runtime, cls.number_of_job,
                                          cls.demand_by_planhorizon, cls.oper_in_list)
 
@@ -251,6 +251,7 @@ class Simulator:
         while True:
             machineId = cls.select_machine()
             if machineId != "NONE":
+                # candidate_list : (lot정보, processing time, setup time, joboperId)
                 candidate_list = cls.get_candidate(machineId)
                 candidate_list = Dispatcher.dispatching_rule_decision(candidate_list, rule, cls.runtime)
                 cls.get_event(candidate_list[0], machineId, rule)
@@ -358,7 +359,7 @@ class Simulator:
             event.machine.complete_setting(event.start_time, event.end_time, event.event_type)
 
     @classmethod
-    def assign_setting(cls, job, machine,reservation_time): #job = 1 machine = 1
+    def assign_setting(cls, job, machine, reservation_time): # job = 1 machine = 1
         q_time_diff = job.assign_setting(machine, cls.runtime)
         machine.assign_setting(job, reservation_time)
         return q_time_diff
@@ -385,7 +386,7 @@ class Simulator:
                     break
         return selected_machine
     @classmethod
-    def get_least_time_machine(cls, job):
+    def get_least_time_machine(cls, job): # 메타휴리스틱 전용
         lot = cls.lot_list[job]
         jobOperId = lot.current_operation_id
         best_machine = ""
@@ -416,7 +417,7 @@ class Simulator:
                 jobOperId = cls.lot_list[lotId].current_operation_id
                 setup_time = cls.machine_list[machineId].get_setup_time(cls.lot_list[lotId].job_type)
                 if cls.can_process_oper_in_machine(cls.lot_list[lotId], machineId):
-                    candidate_list.append([cls.lot_list[lotId],cls.Processing_time_table[jobOperId][machineId], setup_time,jobOperId])
+                    candidate_list.append([cls.lot_list[lotId],cls.Processing_time_table[jobOperId][machineId], setup_time, jobOperId])
 
         return candidate_list
 
@@ -458,7 +459,7 @@ class Simulator:
         cls.step_number +=1
 
     @classmethod
-    def get_event_meta(cls, candidate, machineId):
+    def get_event_meta(cls, candidate, machineId): # 메타휴리스틱 전용
         step_num = cls.step_number
         job, process_time, setup_time, jop = candidate
         start_time = max(cls.machine_list[machineId].last_work_finish_time, job.act_end_time)
@@ -475,7 +476,7 @@ class Simulator:
         cls.step_number += 1
 
     @classmethod
-    def get_fittness_with_meta_heuristic(cls, job_seq , mac_seq,a=None):
+    def get_fittness_with_meta_heuristic(cls, job_seq , mac_seq,a=None): # 메타휴리스틱 전용
         # chromosome = [[machine seq], [job seq]]
         """
             받은 해를 이용해 이벤트를 생성하고 process event로 처리해야함
@@ -601,7 +602,7 @@ class Simulator:
         else:
             return True
     @classmethod
-    def performance_measure(cls):
+    def performance_measure(cls): # 성능 지표 도출에 사용됨
         q_time_true = 0
         q_time_false = 0
         makespan = cls.runtime
@@ -666,7 +667,7 @@ class Simulator:
 
 
     @classmethod
-    def get_job_seq(cls):
+    def get_job_seq(cls): # GA에 사용됨
         job_seq = []
         for i in cls.job_info:
             for j in range(cls.job_info[i]["max_oper"]):
@@ -674,7 +675,7 @@ class Simulator:
         return job_seq
 
     @classmethod
-    def get_random_machine(cls, job):
+    def get_random_machine(cls, job): # GA에 사용됨
         operId = cls.lot_list[job].current_operation_id
         mac_list = cls.Processing_time_table[operId]
         change_mac_list = []

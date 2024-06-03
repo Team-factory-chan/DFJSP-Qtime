@@ -10,10 +10,10 @@ class Run_Simulator:
         with open(f'{pathConfig.absolute_path}/hyperparameter.yaml', 'r', encoding='utf-8') as file:
             config_data = yaml.safe_load(file)
 
-        #Parameters.init_parameter_setting(config_data['engine'])
+        Parameters.init_parameter_setting(config_data['engine'])
         Parameters.init_db_setting(config_data['database'])
-        Parameters.set_dataSetId(["MK01"])  # 사용할 데이터셋 설정
-        #Parameters.set_plan_horizon(840)
+        Parameters.set_dataSetId(["sks_train_1"])  # 사용할 데이터셋 설정
+        Parameters.set_plan_horizon(840)
 
         Simulator.init_simulator(Parameters.datasetId) # 데이터셋 선택 후 데이터에 맞게 시뮬레이터 설정
         print("set complete")

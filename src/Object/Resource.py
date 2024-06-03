@@ -31,7 +31,7 @@ class Resource(object):
         self.reservation_time = reservation_time
         
     def complete_setting(self,start_time, end_time, event_type):
-        #todo 작업이 완료되고 나서야 이전 ideltime이 계산됨 , 상관없을지도..
+        #todo 작업이 완료되고 나서야 이전 idletime이 계산됨 , 상관없을지도..
         if self.last_work_finish_time != start_time:
             self.idle_time += start_time - self.last_work_finish_time #setup이거나 idel이거나
         if event_type == "track_in_finish":
